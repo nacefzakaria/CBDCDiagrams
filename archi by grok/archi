@@ -1,0 +1,58 @@
+@startuml CBDC Architecture
+
+' Define components within the Central Bank CBDC System
+package "Central Bank CBDC System" as CB {
+  package "Ledger Infrastructure" as Ledger {
+    component "Type 1 Balances" as T1
+    component "Type 2 Tokens" as T2
+    component "RTGS Integration" as RTGS
+    component "Permissioned Blockchain" as Blockchain
+  }
+  package "Transaction Engine" as TxEngine {
+    component "Atomic Debit/Credit" as Atomic
+    component "Consensus (Raft/BFT)" as Consensus
+    component "Offline Transaction Processing" as Offline
+  }
+  package "Security Layer" as Security {
+    component "HSM Key Management" as HSM
+    component "ZK-SNARKs" as ZK
+    component "Quantum-Resistant Crypto" as Quantum
+  }
+  package "API Ecosystem" as API {
+    interface "Payment API (ISO 20022)" as PaymentAPI
+    interface "Consent Management (OAuth 2.0/OIDC)" as ConsentAPI
+    component "Developer Portal" as DevPortal
+  }
+}
+
+' Define external systems
+component "Commercial Banks" as Banks
+component "Wallets" as Wallets
+component "Merchants" as Merchants
+component "Regulators" as Regulators
+component "Cross-Border CBDC" as CrossBorder
+
+' Define programmable features
+package "Programmable Features" as ProgFeatures {
+  component "Smart Contracts" as SmartContracts
+  component "Monetary Policy Tools" as MonetaryTools
+}
+
+' Define connections between components
+Banks --> PaymentAPI : Initiate Payments
+Wallets --> ConsentAPI : Manage Consent
+Merchants --> PaymentAPI : Accept Payments
+Regulators --> API : Access Audit Trail
+CrossBorder --> CB : CBDC Connectors
+ProgFeatures --> TxEngine : Execute Logic
+TxEngine --> Ledger : Update Balances
+TxEngine --> Security : Apply Security
+API --> TxEngine : Trigger Transactions
+Offline --> TxEngine : Sync Offline Transactions
+
+' Add clarifying notes
+note left of Ledger : Hybrid ledger with Type 1 balances and Type 2 tokens
+note right of Blockchain : Immutable transaction log
+note bottom of Offline : Supports NFC/USSD for offline transactions
+
+@enduml
