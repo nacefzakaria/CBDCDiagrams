@@ -1,0 +1,61 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam nodesep 10
+skinparam ranksep 20
+skinparam defaultTextAlignment center
+skinparam linetype ortho
+
+rectangle "Settlement Layer" {
+  component "Existing Payment Systems" as EPS {
+    [TARGET2 / Fedwire]
+    [ISO 20022 APIs]
+  }
+
+  component "New Platform (DLT)" as DLT {
+    [Hyperledger Fabric]
+    [Quorum]
+    [Atomic Settlement]
+  }
+
+  component "API Infrastructure" as API {
+    [Consent API (OAuth 2.0)]
+    [Payment Initiation API (REST/GraphQL)]
+    [Information-Sharing API (GraphQL)]
+  }
+
+  component "Public Wallet" as WALLET {
+    [React Native App]
+    [Offline NFC Payments]
+    [Biometric Auth]
+  }
+
+  EPS -down-> API : Integration\n<&arrow-right>
+  DLT -right-> API : Real-Time Settlement\n<&arrow-left>
+  API -down-> WALLET : Backstop Access\n<&arrow-down>
+}
+
+note right of EPS
+  **Existing Payment Systems**
+  - TARGET2, Fedwire
+  - ISO 20022 APIs for legacy integration
+end note
+
+note left of DLT
+  **New Platform (DLT)**
+  - Hyperledger Fabric/Quorum
+  - Atomic settlement
+end note
+
+note right of API
+  **API Infrastructure**
+  - Consent, payment, and data APIs
+  - CGIDE-aligned security
+end note
+
+note left of WALLET
+  **Public Wallet**
+  - React Native/Flutter app
+  - Offline NFC support
+  - Biometric authentication
+end note
+@enduml

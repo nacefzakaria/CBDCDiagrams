@@ -1,0 +1,69 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+skinparam linetype ortho
+skinparam sequenceMessageAlignment center
+
+title CBDC Lifecycle with Accounts, RTGS, and ISO MT/MX Messages
+
+participant "Central Bank" as CB
+participant "RTGS Reserve Pool" as RTGS
+participant "CBDC Issuance Account" as IA
+participant "CBDC General Account" as GA
+participant "CBDC Platform" as PLATFORM
+
+== CBDC Creation (Issuance) ==
+
+CB -> RTGS : ISO MT 202\n**Transfer Reserves**\n(From CB Reserve Pool to CBDC Issuance Account)
+note left: MT 202 (legacy format)\nReserves debited from RTGS\nand credited to IA
+
+RTGS -> IA : ISO 20022 MX (pacs.008)\n**Reserve Transfer Confirmation**
+note right: MX pacs.008 confirms\nreserves are locked in IA
+
+IA -> PLATFORM : **Mint CBDC Request**
+PLATFORM -> IA : **Mint CBDC**\nType 1: Increase balance\nType 2: Mint Tokens
+note right: Type 1: GA balance += X\nType 2: Tokens created in IA
+
+IA -> GA : ISO 20022 MX (pacs.009)\n**CBDC Settlement**\n(Move CBDC to General Account)
+GA --> RTGS : ISO 20022 MX (pacs.002)\n**Issuance Confirmation**
+RTGS --> CB : ISO MT 910\n**CBDC Issued Successfully**
+
+== CBDC Destruction (Redemption) ==
+
+CB -> GA : ISO 20022 MX (pacs.004)\n**Destroy CBDC Request**
+note left: Request to burn CBDC\n(Type 1: Reduce balance\nType 2: Burn Tokens)
+
+GA -> PLATFORM : **Burn CBDC**\nType 1: Decrease balance\nType 2: Delete Tokens
+PLATFORM --> RTGS : ISO 20022 MX (pacs.002)\n**Destruction Confirmation**
+RTGS -> CB : ISO MT 900\n**Reserves Returned to RTGS**
+
+== Accounts & Balances ==
+
+note over IA
+  **CBDC Issuance Account**
+  - Holds reserves backing CBDC.
+  - Type 1: Balance = Reserves.
+  - Type 2: 1:1 Tokens-to-reserve mapping.
+end note
+
+note over GA
+  **CBDC General Account**
+  - Distributes CBDC to banks/public.
+  - Type 1: Total CBDC = GA balance.
+  - Type 2: Tokens registry.
+end note
+
+note over RTGS
+  **RTGS Reserve Pool**
+  - Central bank’s liquidity pool.
+  - Balances adjusted via ISO MT.
+end note
+
+== Compatibility Notes ==
+
+note over of CB
+  **Legacy Compatibility**
+  - Converts ISO MT ↔ MX via middleware.
+  - Example: MT 202 (legacy) → MX pacs.008 (modern).
+end note
+@enduml

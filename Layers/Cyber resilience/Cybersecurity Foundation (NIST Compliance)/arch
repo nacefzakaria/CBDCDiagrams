@@ -1,0 +1,28 @@
+@startuml
+skinparam nodesep 20
+skinparam ranksep 25
+
+rectangle "NIST CSF Framework" {
+  component "Identify" as N1
+  component "Protect" as N2
+  component "Detect" as N3
+  component "Respond" as N4
+  component "Recover" as N5
+}
+
+N1 --> N2 --> N3 --> N4 --> N5
+
+component "Implementation" as IMPL {
+  [FIPS 140-2 L3 HSM]
+  [Quantum-resistant Crypto]
+  [Zero Trust Architecture]
+}
+
+N2 -down-> IMPL
+note bottom of IMPL
+  **Security Controls**
+  - Hardware Security Modules
+  - Crypto-agile implementation
+  - Continuous authentication
+end note
+@enduml

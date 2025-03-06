@@ -1,0 +1,289 @@
+Let’s break down each diagram and its purpose in addressing the **CBDC architecture requirements**. I’ll explain their components, relationships, and how they map to the design principles you provided.
+
+---
+
+### **1. Embedded Resilience (100% Availability)**
+```plantuml
+@startuml
+left to right direction
+
+component "Primary Data Center" as DC1 {
+  [Active Nodes]
+  [Live Transaction Processor]
+}
+
+component "Secondary Data Center" as DC2 {
+  [Hot Standby Nodes]
+  [Async Replication]
+}
+
+component "Edge Cache" as EDGE {
+  [Buffered Transactions]
+  [Local Validation]
+}
+
+DC1 -right-> DC2 : Real-time Sync
+DC1 -down-> EDGE : Push Updates
+EDGE -up-> DC2 : Failover Sync
+
+note right of DC1
+  **Active-Active Design**
+  - Processes transactions during outages
+  - Auto-failover between centers
+  - Buffered edge processing
+end note
+@enduml
+```
+
+#### **Explanation**
+- **Primary/Secondary Data Centers**: Ensure **geo-redundancy** and **100% availability** by replicating data in real time. If the primary center fails, the secondary takes over seamlessly.
+- **Edge Cache**: Stores transactions temporarily during infrastructure outages. Once connectivity is restored, transactions are synced to the main ledger.
+- **Key Feature**: **Asynchronous processing** allows transactions to proceed even if parts of the infrastructure are offline.
+
+---
+
+### **2. Cybersecurity Foundation (NIST Compliance)**
+```plantuml
+@startuml
+skinparam nodesep 20
+skinparam ranksep 25
+
+rectangle "NIST CSF Framework" {
+  component "Identify" as N1
+  component "Protect" as N2
+  component "Detect" as N3
+  component "Respond" as N4
+  component "Recover" as N5
+}
+
+N1 --> N2 --> N3 --> N4 --> N5
+
+component "Implementation" as IMPL {
+  [FIPS 140-2 L3 HSM]
+  [Quantum-resistant Crypto]
+  [Zero Trust Architecture]
+}
+
+N2 -down-> IMPL
+note bottom of IMPL
+  **Security Controls**
+  - Hardware Security Modules
+  - Crypto-agile implementation
+  - Continuous authentication
+end note
+@enduml
+```
+
+#### **Explanation**
+- **NIST CSF Framework**: A structured approach to cybersecurity with five phases:
+  1. **Identify**: Asset management and risk assessment.
+  2. **Protect**: Implement safeguards (e.g., encryption, access controls).
+  3. **Detect**: Monitor for anomalies.
+  4. **Respond**: Incident response protocols.
+  5. **Recover**: Disaster recovery plans.
+- **Implementation Layer**:
+  - **FIPS 140-2 HSM**: Secures cryptographic keys in hardware.
+  - **Zero Trust**: Requires continuous authentication for all users/devices.
+  - **Quantum-Resistant Crypto**: Prepares for future threats.
+
+---
+
+### **3. Data Protection Architecture**
+```plantuml
+@startuml
+left to right direction
+
+database "Encrypted Database" as DB {
+  [PII Vault] <<HSM>>
+  [Transaction Store] <<Encrypted>>
+  [Metadata] <<ClearText>>
+}
+
+component "Field-Level Encryption" as FLE {
+  [Key per Data Class]
+  [Role-Based Access]
+}
+
+component "Crypto Manager" as CM {
+  [Algorithm Rotation]
+  [Key Lifecycle]
+  [Quantum Preparation]
+}
+
+DB -right-> FLE : Selective Decryption
+FLE -down-> CM : Key Requests
+CM --> DB : Crypto Updates
+
+note top of DB
+  **Data Separation**
+  1. Personal Identifiable Information (HSM)
+  2. Transaction Details (AES-256)
+  3. Metadata (Clear for analytics)
+end note
+@enduml
+```
+
+#### **Explanation**
+- **Encrypted Database**:
+  - **PII Vault**: Stores sensitive user data (e.g., names, IDs) in an HSM for maximum security.
+  - **Transaction Store**: Encrypted transactional data (AES-256) with auditability.
+  - **Metadata**: Unencrypted for analytics but sanitized.
+- **Field-Level Encryption (FLE)**:
+  - Encrypts specific fields (e.g., account numbers) with unique keys.
+  - Only authorized roles can decrypt specific data.
+- **Crypto Manager**:
+  - Rotates encryption algorithms to maintain **crypto-agility**.
+  - Prepares for quantum computing threats.
+
+---
+
+### **4. Modular Settlement Protocol**
+```plantuml
+@startuml
+skinparam componentStyle rectangle
+
+frame "Settlement Engine" {
+  component "Message Router" as ROUTER {
+    [Protocol Adapters]
+    [Schema Validation]
+  }
+  
+  component "Privacy Gateway" as GATEWAY {
+    [Field Masking]
+    [Selective Encryption]
+    [ZKP Validation]
+  }
+  
+  component "Execution Layer" as EXEC {
+    [Smart Contracts]
+    [Atomic Finality]
+  }
+}
+
+ROUTER --> GATEWAY : Normalized Message
+GATEWAY --> EXEC : Sanitized Instruction
+EXEC --> ROUTER : Settlement Proof
+
+note right of GATEWAY
+  **Modular Features**
+  - ISO 20022 compliance
+  - Multiple encryption schemes
+  - Privacy-preserving proofs
+end note
+@enduml
+```
+
+#### **Explanation**
+- **Message Router**: Handles incoming transactions (supports multiple protocols like ISO 20022).
+- **Privacy Gateway**:
+  - **Field Masking**: Hides sensitive data from unauthorized parties.
+  - **Selective Encryption**: Encrypts specific fields (e.g., amounts, accounts).
+  - **ZKP Validation**: Uses Zero-Knowledge Proofs to validate transactions without revealing details.
+- **Execution Layer**:
+  - Enforces **atomic settlement** (transactions either fully succeed or fail).
+  - Executes programmable logic (e.g., DvP/PvP via smart contracts).
+
+---
+
+### **5. Availability Architecture**
+```plantuml
+@startuml
+left to right direction
+
+cloud "Global Cloud Providers" {
+  node "Region A" as RA
+  node "Region B" as RB
+}
+
+component "Orchestrator" as ORCH {
+  [Health Checks]
+  [Traffic Management]
+  [DR Automation]
+}
+
+RA -up-> ORCH : Heartbeat
+RB -up-> ORCH : Heartbeat
+ORCH -down-> RA : Failover Triggers
+
+component "Offline Devices" as DEV {
+  [Secure Enclave]
+  [Local Ledger]
+  [Sync Manager]
+}
+
+DEV --> ORCH : Delayed Settlement
+note on link
+  Processes transactions
+  during outages
+end note
+@enduml
+```
+
+#### **Explanation**
+- **Global Cloud Providers**: Distribute infrastructure across regions for **geo-redundancy**.
+- **Orchestrator**:
+  - Monitors node health.
+  - Triggers failover to backup regions during outages.
+- **Offline Devices**:
+  - Use secure enclaves to process transactions locally.
+  - Sync with the main ledger once connectivity resumes.
+
+---
+
+### **6. Crypto-Agile Implementation**
+```plantuml
+@startuml
+skinparam monochrome true
+
+component "Crypto Abstraction Layer" as CAL {
+  [Algorithm Registry]
+  [Performance Monitor]
+  [Migration Engine]
+}
+
+database "Crypto Providers" as CP {
+  [OpenSSL]
+  [BoringSSL]
+  [HSM Libs]
+}
+
+component "Services" as SVC {
+  [Digital Signatures]
+  [Encryption]
+  [Hashing]
+}
+
+CAL --> CP : Algorithm Binding
+CAL --> SVC : Crypto Operations
+
+note right of CAL
+  **Agility Features**
+  - Runtime algorithm switching
+  - FIPS/NIST compliance checks
+  - Quantum readiness scoring
+end note
+@enduml
+```
+
+#### **Explanation**
+- **Crypto Abstraction Layer (CAL)**:
+  - Decouples cryptographic logic from applications.
+  - Maintains a registry of algorithms (e.g., RSA, ECC, post-quantum).
+- **Crypto Providers**:
+  - Plug-in modules for different cryptographic libraries (e.g., OpenSSL for FIPS compliance).
+- **Services**:
+  - Standardized crypto operations (e.g., signing, encryption) that can switch algorithms without code changes.
+
+---
+
+### **Summary of Key Requirements Addressed**
+| Requirement                | Diagram(s) Addressing It           | Key Components/Techniques              |
+|---------------------------|------------------------------------|----------------------------------------|
+| 100% Availability         | 1, 5                               | Geo-redundancy, edge caching, failover |
+| NIST Compliance           | 2                                  | HSM, Zero Trust, NIST CSF framework    |
+| Data Separation           | 3                                  | PII vault, field-level encryption      |
+| Crypto-Agility            | 3, 6                               | Algorithm rotation, abstraction layer  |
+| Modular Encryption        | 4                                  | Privacy gateway, selective encryption  |
+| Geo-Redundancy            | 1, 5                               | Multi-cloud deployment, orchestrator   |
+
+This architecture ensures compliance with all specified requirements while maintaining flexibility for future upgrades. Let me know if you’d like to dive deeper into any component!

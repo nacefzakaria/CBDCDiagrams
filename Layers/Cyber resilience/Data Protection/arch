@@ -1,0 +1,31 @@
+@startuml
+left to right direction
+
+database "Encrypted Database" as DB {
+  [PII Vault] <<HSM>>
+  [Transaction Store] <<Encrypted>>
+  [Metadata] <<ClearText>>
+}
+
+component "Field-Level Encryption" as FLE {
+  [Key per Data Class]
+  [Role-Based Access]
+}
+
+component "Crypto Manager" as CM {
+  [Algorithm Rotation]
+  [Key Lifecycle]
+  [Quantum Preparation]
+}
+
+DB -right-> FLE : Selective Decryption
+FLE -down-> CM : Key Requests
+CM --> DB : Crypto Updates
+
+note top of DB
+  **Data Separation**
+  1. Personal Identifiable Information (HSM)
+  2. Transaction Details (AES-256)
+  3. Metadata (Clear for analytics)
+end note
+@enduml

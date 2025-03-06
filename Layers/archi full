@@ -1,0 +1,130 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam nodesep 10
+skinparam ranksep 20
+skinparam defaultTextAlignment center
+skinparam linetype ortho
+
+rectangle "Unified CBDC Ledger (BIS 2023 Concept)" {
+  rectangle "Central Bank Core" {
+    component "Issuance Management" as ISSUANCE {
+      [RTGS Interface]
+      [Token Mint/Burn]
+      [Balance Adjustment]
+    }
+    
+    component "Core Ledger" as LEDGER {
+      [Accounts (CouchDB)]
+      [Fungible Tokens (ERC-20)]
+      [NFTs (ERC-721)]
+      [Transaction Log (Blockchain)]
+    }
+
+    component "Transaction Engine" as ENGINE {
+      [Atomic DvP/PvP]
+      [Central Bank Signing]
+      [Adaptable Consensus\n(PBFT/Raft/Centralized)]
+    }
+  }
+
+  component "API Gateway" as API {
+    [Payment Initiation (ISO 20022)]
+    [Account Information]
+    [Programmability Interface]
+    [Cross-border Module]
+  }
+
+  component "Security & Governance" as SECURITY {
+    [HSM (AWS CloudHSM)]
+    [ZK-SNARKs]
+    [Attribute Matrix]
+    [Compliance Engine]
+  }
+
+  component "Interoperability Layer" as INTEROP {
+    [Commercial Bank Bridges]
+    [CBDC Connectors]
+    [Legacy System Adapters]
+  }
+
+  component "Public Wallet" as WALLET {
+    [User Interface]
+    [Offline Module]
+    [Biometric Auth]
+    [P2P Engine]
+  }
+
+  component "Participant Nodes" as NODES {
+    [Approved Financial Institutions]
+    [Regulated Wallets]
+    [Merchant Services]
+  }
+
+  ISSUANCE -down-> LEDGER : Issuance/Destruction\n(Type1/Type2)
+  LEDGER -right-> ENGINE : Balance State
+  ENGINE -up-> SECURITY : Authorization\nValidation
+  API -down-> WALLET : Consumer Access
+  API -right-> INTEROP : Cross-system\nSettlement
+  SECURITY -left-> LEDGER : Privacy Controls
+  SECURITY -down-> API : OAuth2/OIDC
+  INTEROP -up-> ENGINE : Atomic Swaps
+  NODES --> API : Institutional Access
+  NODES --> INTEROP : Commercial Money\nTransfers
+}
+
+note top of ISSUANCE
+  **Centralized Issuance Control**
+  - RTGS integration for money creation
+  - Token mint/burn (Type 2)
+  - Balance adjustment (Type 1)
+  - Central bank exclusive control
+end note
+
+note right of ENGINE
+  **Adaptable Settlement**
+  - Central bank signature (initial phase)
+  - Configurable consensus models
+  - Supports DvP/PvP
+  - Smart contract execution
+end note
+
+note left of API
+  **Open Financial Services**
+  - ISO 20022 compliant
+  - Programmable money API
+  - Cross-border functionality
+  - Consent management (OAuth2)
+end note
+
+note right of SECURITY
+  **Compliance & Privacy**
+  - Attribute-based access control
+  - Regulatory reporting
+  - Zero-knowledge proofs
+  - AML/KYC integration
+end note
+
+note bottom of INTEROP
+  **Multi-system Integration**
+  - Commercial bank bridges
+  - Cross-CBDC protocols
+  - Legacy payment adapters
+  - Atomic cross-ledger swaps
+end note
+
+note left of WALLET
+  **Universal Access**
+  - Biometric authentication
+  - Offline capability
+  - P2P transactions
+  - Tiered account models
+end note
+
+note right of NODES
+  **Approved Ecosystem**
+  - Commercial banks
+  - Licensed wallets
+  - Regulated merchants
+  - Audit nodes
+end note
+@enduml

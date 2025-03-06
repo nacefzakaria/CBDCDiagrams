@@ -1,0 +1,32 @@
+@startuml
+skinparam componentStyle rectangle
+
+frame "Settlement Engine" {
+  component "Message Router" as ROUTER {
+    [Protocol Adapters]
+    [Schema Validation]
+  }
+  
+  component "Privacy Gateway" as GATEWAY {
+    [Field Masking]
+    [Selective Encryption]
+    [ZKP Validation]
+  }
+  
+  component "Execution Layer" as EXEC {
+    [Smart Contracts]
+    [Atomic Finality]
+  }
+}
+
+ROUTER --> GATEWAY : Normalized Message
+GATEWAY --> EXEC : Sanitized Instruction
+EXEC --> ROUTER : Settlement Proof
+
+note right of GATEWAY
+  **Modular Features**
+  - ISO 20022 compliance
+  - Multiple encryption schemes
+  - Privacy-preserving proofs
+end note
+@enduml

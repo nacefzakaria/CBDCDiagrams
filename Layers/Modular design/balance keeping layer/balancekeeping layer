@@ -1,0 +1,65 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam nodesep 10
+skinparam ranksep 20
+skinparam defaultTextAlignment center
+skinparam linetype ortho
+
+rectangle "Balance Keeping Layer" {
+  component "Account-Based Ledger" as ABL {
+    [Hyperledger Fabric (World State)]
+    [Atomic Debit/Credit Engine (Chaincode)]
+    [KYC/AML Integration (REST APIs)]
+  }
+
+  component "Token-Based Ledger" as TBL {
+    [Fungible Tokens (ERC-20-like)]
+    [NFTs (ERC-721-like)]
+    [Smart Contracts (Chaincode)]
+  }
+
+  ABL -left-> TBL : Interoperability\n<&arrow-right>
+
+  component "Interoperability Protocol" as INTEROP {
+    [Atomic Swaps (gRPC)]
+    [Cross-Chain Bridges (Hyperledger Cactus)]
+    [Hybrid Smart Contracts (Chaincode)]
+  }
+
+  component "Security & Privacy" as SEC {
+    [HSM (Thales, AWS CloudHSM)]
+    [ZK-SNARKs (ZoKrates)]
+    [RBAC (Fabric CA)]
+  }
+
+  TBL -down-> INTEROP : Token ↔ Account\nConversion
+}
+
+note left of ABL
+  **Account-Based Ledger**
+  - **Hyperledger Fabric**: World State (CouchDB) for balances.
+  - **Chaincode**: Atomic debit/credit logic.
+  - **REST APIs**: KYC/AML integration.
+end note
+
+note right of TBL
+  **Token-Based Ledger**
+  - **Fungible Tokens**: ERC-20-like (Chaincode).
+  - **NFTs**: ERC-721-like (Chaincode).
+  - **Smart Contracts**: Programmable rules (Chaincode).
+end note
+
+note right of INTEROP
+  **Interoperability Protocol**
+  - **gRPC**: Atomic swaps.
+  - **Hyperledger Cactus**: Cross-chain bridges.
+  - **Chaincode**: Hybrid smart contracts.
+end note
+
+note left of SEC
+  **Security & Privacy**
+  - **HSM**: Thales or AWS CloudHSM for root keys.
+  - **ZK-SNARKs**: ZoKrates for privacy.
+  - **RBAC**: Fabric CA for role-based access.
+end note
+@enduml

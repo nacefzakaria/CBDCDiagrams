@@ -1,0 +1,25 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+skinparam linetype ortho
+
+actor "User" as U
+participant "PSP/Fintech" as PSP
+participant "CBDC API Gateway" as API
+participant "Central Bank Ledger" as CB
+database "Regulatory Module" as REG
+
+U -> PSP: Request payment/account access
+PSP -> API: POST /consent (OAuth 2.0)
+API -> U: Redirect to auth portal
+U -> API: Grant consent
+API -> PSP: Consent token
+
+PSP -> API: POST /payments (with token)
+API -> REG: AML/KYC check
+REG --> API: Approved
+API -> CB: Validate & settle transaction
+CB --> API: Success
+API --> PSP: Payment confirmed
+PSP --> U: Receipt
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+left to right direction
+
+component "Primary Data Center" as DC1 {
+  [Active Nodes]
+  [Live Transaction Processor]
+}
+
+component "Secondary Data Center" as DC2 {
+  [Hot Standby Nodes]
+  [Async Replication]
+}
+
+component "Edge Cache" as EDGE {
+  [Buffered Transactions]
+  [Local Validation]
+}
+
+DC1 -right-> DC2 : Real-time Sync
+DC1 -down-> EDGE : Push Updates
+EDGE -up-> DC2 : Failover Sync
+
+note right of DC1
+  **Active-Active Design**
+  - Processes transactions during outages
+  - Auto-failover between centers
+  - Buffered edge processing
+end note
+@enduml
