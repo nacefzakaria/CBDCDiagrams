@@ -1,0 +1,85 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+skinparam linetype ortho
+skinparam sequenceMessageAlignment center
+
+title CBDC Distribution with Account Relationships
+
+participant "Central Bank" as CB
+participant "RTGS Reserve Pool" as RTGS
+database "CBDC Issuance\nAccount (IA)" as IA
+database "CBDC General\nAccount (GA)" as GA
+participant "Commercial Bank\nAccount (CM)" as CM
+database "End User\nAccount (EU)" as EU
+participant "CBDC Platform" as PLATFORM
+
+== Account-Based Distribution Flow ==
+
+group Step 1: Reserve Allocation
+CB -> RTGS: ISO MT 202\nTransfer Reserves (X)
+RTGS -> IA: MX pacs.008\nConfirm Reserve Lock
+IA -> PLATFORM: **Create CBDC**\nType1: GA += X\nType2: Mint X Tokens
+PLATFORM -> GA: MX pacs.009\nSettle to GA
+end
+
+group Step 2: Bank Distribution
+GA -> CM: MX pacs.009\nTransfer CBDC (Y)
+alt Type 1 (Balance)
+CM -> CM: Create Sub-Accounts\nCM Balance: += Y
+else Type 2 (Token)
+CM -> CM: Token Vault Update\nCM Vault: += Y Tokens
+end
+PLATFORM --> CM: MX pacs.002\nConfirmation
+
+group Step 3: User Allocation
+CM -> EU: MX pacs.009\nCBDC Transfer (Z)
+alt Type 1
+EU -> EU: Balance += Z\nCM Sub-Account -= Z
+else Type 2
+EU -> EU: Wallet += Z Tokens\nCM Vault -= Z
+end
+PLATFORM --> EU: MX pacs.002\nReceipt
+end
+
+== Account Relationships ==
+
+note over IA
+**Issuance Account**
+- Backed 1:1 by RTGS reserves
+- Type1: Mirror of RTGS balance
+- Type2: Token minting authority
+end note
+
+note over GA
+**General Account**
+- Central distribution hub
+- Type1: Aggregated CBDC balance
+- Type2: Token pool custodian
+end note
+
+note over CM
+**Commercial Bank Account**
+- Type1: Parent account with sub-accounts
+- Type2: Institutional token vault
+- Daily reconciliation with GA
+end note
+
+note over EU
+**End User Account**
+- Type1: Individual balance
+- Type2: Personal token wallet
+- Biometric authentication
+end note
+
+== Redemption Cycle ==
+
+group CBDC to Fiat
+EU -> CM: MX pacs.004\nRedeem CBDC (Z)
+CM -> GA: MX pacs.004\nBurn Request
+GA -> PLATFORM: **Reduce Balance**\nType1: GA -= Z\nType2: Burn Tokens
+PLATFORM -> RTGS: MX pacs.002\nRelease Reserves
+RTGS -> CM: MT 202\nFiat Transfer (Z)
+CM -> EU: **Credit Notification**
+end
+@enduml

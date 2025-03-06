@@ -1,0 +1,70 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+skinparam linetype ortho
+skinparam sequenceMessageAlignment center
+
+title CBDC Distribution Flow: CB → Commercial Banks → End Users
+
+participant "Central Bank (CB)" as CB
+participant "RTGS System" as RTGS
+participant "CBDC Platform" as PLATFORM
+participant "Commercial Bank (CM)" as CM
+participant "End User" as USER
+
+== Phase 1: CB → CM Distribution via RTGS ==
+
+group Initial Liquidity Provision
+CB -> RTGS: ISO 20022 MX (pacs.008)\n**Reserve Transfer**\nAmount: X CBDC
+RTGS -> PLATFORM: **Update CM Account**\nType 1: Balance += X\nType 2: Mint X Tokens
+PLATFORM --> RTGS: MX (pacs.002)\n**Confirmation**
+RTGS --> CB: ISO MT 910\n**Settlement Complete**
+end
+
+== Phase 2: CM → End User Distribution ==
+
+group User Allocation
+CM -> PLATFORM: ISO 20022 MX (pacs.008)\n**User Credit Request**\nUser ID: 123\nAmount: Y CBDC
+
+alt Type 1 (Balance-Based)
+PLATFORM -> PLATFORM: Adjust CM Account (Balance -= Y)\nCreate User Sub-Account (Balance += Y)
+else Type 2 (Token-Based)
+PLATFORM -> PLATFORM: Transfer Tokens\nCM Wallet: -= Y\nUser Wallet: += Y
+end
+
+PLATFORM --> CM: MX (pacs.002)\n**Transaction Confirmation**
+CM -> USER: **Notification**\n(SMS/App Push)
+end
+
+== Reverse Flow: User Redemption ==
+
+group Redemption to Fiat
+USER -> CM: **Redeem Request**\nAmount: Z CBDC
+CM -> PLATFORM: MX (pacs.004)\n**Burn/Deduct Request**
+PLATFORM -> RTGS: **Reserve Adjustment**\nType 1: Balance -= Z\nType 2: Burn Tokens
+RTGS --> CM: MT 202\n**Fiat Transfer**\nAmount: Z (Local Currency)
+CM -> USER: **Fiat Credit**\n(Bank Transfer)
+end
+
+== Annotations ==
+
+note over CB,RTGS
+**Key Mechanisms**
+1. RTGS acts as bridge between CB reserves\n   and CBDC ledger
+2. MX messages for modern CBDC flows\n   MT for legacy integration
+3. Type 1: Balance adjustments\n   Type 2: Token transfers
+end note
+
+note right of PLATFORM
+**CM Account Structure**
+- Type 1: Parent account with sub-accounts\n  for users
+- Type 2: Token wallets with\n  hierarchical control
+end note
+
+note over USER
+**End-User Access**
+- Mobile apps/wallets
+- QR/NFC payments
+- Biometric auth
+end note
+@enduml
