@@ -1,0 +1,117 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor LightBlue
+  BorderColor DarkSlateGray
+}
+
+title CBDC System Use Case Diagram (Architecture-Aligned)
+
+package "Core Ledger Operations" {
+  :Central Bank: as CB
+  (Manage Type 1 Balances) as UC1
+  (Issue/Retire Type 2 Tokens) as UC2
+  (Execute RTGS Reconciliation) as UC3
+  (Maintain Permissioned Blockchain) as UC4
+  
+  CB --> UC1
+  CB --> UC2
+  CB --> UC3
+  CB --> UC4
+}
+
+package "Transaction Processing" {
+  :Merchant: as MCH
+  :Wallet Provider: as WP
+  (Process Atomic DvP Transactions) as UC5
+  (Handle Offline NFC/USSD Txns) as UC6
+  (Validate Consensus -Raft/BFT-) as UC7
+  (Sync Offline Transactions) as UC8
+  
+  MCH --> UC5
+  WP --> UC6
+  UC6 .> UC8 : <<extend>>
+  UC5 --> UC7 : <<include>>
+}
+
+package "Security Framework" {
+  (Manage HSM Root Keys) as UC9
+  (Generate ZK-SNARK Proofs) as UC10
+  (Rotate Quantum-resistant Keys) as UC11
+  (Enforce Privacy Policies) as UC12
+  
+  CB --> UC9
+  CB --> UC11
+  WP --> UC10
+  WP --> UC12
+}
+
+package "API Ecosystem" {
+  :Developer: as DEV
+  :Commercial Bank: as CBANK
+  (Access Payment API -ISO 20022-) as UC13
+  (Manage OAuth2/OIDC Consent) as UC14
+  (Integrate Developer Portal) as UC15
+  (Submit Smart Contract Code) as UC16
+  
+  CBANK --> UC13
+  WP --> UC14
+  DEV --> UC15
+  DEV --> UC16
+}
+
+package "Programmable Features" {
+  (Implement Tiered Remuneration) as UC17
+  (Execute Time-bound Stimulus) as UC18
+  (Enforce Transaction Rules) as UC19
+  (Update Monetary Parameters) as UC20
+  
+  CB --> UC17
+  CB --> UC18
+  CB --> UC20
+  UC16 .> UC19 : <<extend>>
+}
+
+package "Cross-Border Integration" {
+  :Foreign CBDC System: as FCBDC
+  (Settle Multi-CBDC Transactions) as UC21
+  (Convert FX via Bridge) as UC22
+  (Verify Cross-chain Proofs) as UC23
+  
+  FCBDC --> UC21
+  FCBDC --> UC22
+  FCBDC --> UC23
+}
+
+' Architectural relationships
+UC1 .> UC3 : <<extend>>
+UC2 .> UC4 : <<include>>
+UC9 --> UC11 : <<include>>
+UC13 .> UC5 : <<extend>>
+UC19 --> UC7 : <<include>>
+UC21 .> UC22 : <<include>>
+UC15 .> UC16 : <<extend>>
+
+note right of UC1
+  **Type 1/Type 2 Architecture**
+  - Type 1: Central bank accounts
+  - Type 2: Token-based wallets
+  - Hybrid settlement through UC3
+end note
+
+note left of UC6
+  **Offline Protocol**
+  - NFC for proximity payments
+  - USSD for basic feature phones
+  - Asymmetric crypto for offline signing
+end note
+
+note bottom of UC16
+  **Smart Contract Constraints**
+  - Gas limits for monetary policy
+  - Formal verification required
+  - Sandboxed execution
+end note
+
+@enduml

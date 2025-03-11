@@ -1,0 +1,109 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor LightBlue
+  BorderColor DarkSlateGray
+}
+
+title BIS-Compliant CBDC System Use Case Diagram
+
+package "Monetary Authority" {
+  :Central Bank: as CB
+  (Issue/Retire CBDC via RTGS) as UC1
+  (Implement Monetary Policy Tools) as UC2
+  (Manage Quantum-Resistant Keys) as UC3
+  (Oversee Liquidity Management) as UC4
+  
+  CB --> UC1
+  CB --> UC2
+  CB --> UC3
+  CB --> UC4
+}
+
+package "Financial Ecosystem" {
+  :Financial Institution: as FI
+  :Payment Service Provider: as PSP
+  :Retail User: as RU
+  (Facilitate Wholesale Settlement) as UC5
+  (Enable Programmable Payments) as UC6
+  (Process P2P Transactions) as UC7
+  (Manage Tiered Wallets) as UC8
+  (Convert CBDC/Fiat) as UC9
+  
+  FI --> UC5
+  PSP --> UC6
+  RU --> UC7
+  RU --> UC8
+  RU --> UC9
+}
+
+package "Interoperability Layer" {
+  :Cross-border Network: as CBN
+  :Legacy System: as LS
+  (Facilitate Cross-currency Settlement) as UC10
+  (Support API Gateway) as UC11
+  (Maintain Payment System Bridge) as UC12
+  (Ensure ISO 20022 Compliance) as UC13
+  
+  CBN --> UC10
+  CBN --> UC13
+  LS --> UC12
+  CB --> UC11
+}
+
+package "Oversight Framework" {
+  :Financial Regulator: as FR
+  :AML Authority: as AML
+  (Conduct Transaction Monitoring) as UC14
+  (Enforce Risk-based Limits) as UC15
+  (Manage Layered Identities) as UC16
+  (Perform System Resilience Testing) as UC17
+  
+  FR --> UC14
+  FR --> UC15
+  AML --> UC16
+  FR --> UC17
+}
+
+package "System Layer" {
+  (Ensure Cyber Resilience) as UC18
+  (Maintain Offline Protocol) as UC19
+  (Support Multi-Ledger Settlement) as UC20
+  (Enable Audit Trail Generation) as UC21
+  
+  UC18 <.. CB : <<include>>
+  UC19 <.. RU : <<extend>>
+  UC20 <.. FI : <<include>>
+  UC21 <.. FR : <<include>>
+}
+
+' Critical Relationships
+UC3 .> UC18 : <<extend>>
+UC11 .> UC10 : <<include>>
+UC15 .> UC16 : <<include>>
+UC20 .> UC5 : <<extend>>
+UC13 .> UC12 : <<extend>>
+
+note right of UC1
+  **BIS Alignment**
+  - RTGS integration (FNA principle)
+  - Tiered remuneration structure
+  - Hybrid architecture support
+end note
+
+note right of UC8
+  **Wallet Requirements**
+  - Tiered transaction limits
+  - Hardware-level security
+  - Context-based privacy (e.g. eCash model)
+end note
+
+note right of UC10
+  **Cross-border Features**
+  - Multi-CBDC bridges
+  - FX conversion layer
+  - Continuous Linked Settlement
+end note
+
+@enduml
